@@ -1,90 +1,168 @@
-{
 var d = document;
 var canvas = d.createElement('canvas');
-canvas.height = 1500;
-canvas.width = 1500;
+canvas.height = 8500;
+canvas.width = 8500;
 var ctx = canvas.getContext('2d');
 
-var img1 = new Image();
+class imageExtend extends Image{
+	ratio = 0;
+	general_ratio_width = 0;
+	general_ratio_height = 0;
+}
+
+var img1 = new imageExtend();
 img1.src = "./pic/1.png";
-img1.name = "1";
 
-var img2 = new Image();
+var img2 = new imageExtend();
 img2.src = "./pic/2.png";
-img2.name = "2";
 
-var img3 = new Image();
+var img3 = new imageExtend();
 img3.src = "./pic/3.png";
-img3.name = "3";
 
-var img4 = new Image();
+var img4 = new imageExtend();
 img4.src = "./pic/4.png";
-img4.name = "4";
 
-var img5 = new Image();
+var img5 = new imageExtend();
 img5.src = "./pic/5.png";
-img5.name = "5";
-}
 
-class Row extends Set{
+var img6 = new imageExtend();
+img6.src = "./pic/5.png";
+
+var img7 = new imageExtend();
+img7.src = "./pic/2.png";
+
+class row extends Set{
+	x = 0;
+	y = 0;
 	height = 0;
 	width = 0;
-	coefficients = new Set();
+	ratio = 1;
+
+	set (x,y,width,height){
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+
+		for (let e of this.values()) {
+			e.width = Math.round(e.ratio * width);
+			e.height = height;
+		}
+	}
+
+
+	calculate() {
+		for (let e of this.values()) {
+			let isImage = (e instanceof imageExtend);
+			if (!isImage) e.calculate();	
+			if (e.height > this.height) this.height = e.height;
+		}
+
+		this.total_calculate();
+		
+	}
+
+	total_calculate() {
+		for (let e of this.values()) {
+			e.width = Math.round(e.width * this.height / e.height);
+			this.width += e.width;
+		}
+
+		for (let e of this.values()) {
+			e.ratio = e.width / this.width;
+		}
+		
+	}
+
+	draw() {
+		let draw_index = 0;
+		for (let e of this.values()) {
+			if (e instanceof imageExtend){
+				ctx.drawImage(e,this.x+draw_index,this.y,e.width,this.height);
+			} else {
+				e.set(this.x+draw_index,this.y,e.width,this.height);
+				e.draw();
+			}
+			draw_index += e.width;
+		}
+	}
+
+
 }
 
-class Column extends Set{
+class column extends Set{
+	x = 0;
+	y = 0;
 	height = 0;
 	width = 0;
-	coefficients = new Set();
+	ratio = 1;
 
+	set (x,y,width,height){
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+
+		for (let e of this.values()) {
+			e.height = Math.round(e.ratio * height);
+			e.width = width;
+		}
+
+	}
+	
+	calculate() {
+		for (let e of this.values()) {
+			let isImage = (e instanceof imageExtend);
+			if (!isImage) e.calculate();	
+			if (e.width > this.width) this.width = e.width;
+		}
+		this.total_calculate();
+	}
+
+	total_calculate() {
+		for (let e of this.values()) {
+			e.height = Math.round(e.height * this.width / e.width);
+			this.height += e.height;
+		}
+
+		for (let e of this.values()) {
+			e.ratio = e.height / this.height ;
+		}
+	}
+
+	draw() {
+		let draw_index = 0;
+		for (let e of this.values()) {
+			if (e instanceof imageExtend){
+				ctx.drawImage(e,this.x,this.y+draw_index,this.width,e.height);
+			} else {
+				e.set(this.x,this.y+draw_index,this.width,e.height);
+				e.draw();
+			}
+			draw_index += e.height;
+		}
+	}
 }
 
 function drawStoryboard(root,size) {
-	drawRow(root,size);
-}
-
-function drawRow(root,size){
-	root.forEach(el => {
-		if (el.height > root.height) root.height = el.height;
-	});
-	
-	root.forEach(el => {
-		let ratio_height = root.height/el.height;
-		let width = Math.round(el.width * ratio_height);
-		root.coefficients.add(width);
-		root.width += width;
-	});
-
-	let index = 0;
-	let draw_index = 0;
-
-	root.forEach(el => {
-		let ratio_width = Array.from(root.coefficients)[index]/root.width;
-		let general_ratio_width;
-		if (root.width > size) {
-			general_ratio_width = size/root.width 
-		} else {
-			general_ratio_width = root.width/size;
-		}
-		el.width = Math.round(ratio_width * size);
-		let height = general_ratio_width * root.height;
-		ctx.drawImage(el,draw_index,0,el.width, height);
-		index++;
-		draw_index += el.width;
-	});
-}
-
-function drawColumn(){
-	
+	root.calculate();
+	root.set(30,30,size,size * 0.5);
+	root.draw();
 }
 
 function initiate() {
-	let tree = new Row();
-
-	tree.add(img1).add(img2).add(img3).add(img4).add(img5);
-
-	drawStoryboard(tree,800)
-
+	let r1 = new row();
+	let r2 = new row();
+	let c1 = new column();
+	let c2 = new column();
+	let c3 = new column();
+	
+	c3.add(img2).add(img3);
+	r2.add(img4).add(c3);
+	c1.add(img5).add(r2);
+	r1.add(img7).add(c1).add(img1);
+	
+	drawStoryboard(r1,700);
 	d.body.appendChild(canvas);
 }
 

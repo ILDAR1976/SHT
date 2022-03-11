@@ -26,10 +26,19 @@ var img5 = new imageExtend();
 img5.src = "./pic/5.png";
 
 var img6 = new imageExtend();
-img6.src = "./pic/5.png";
+img6.src = "./pic/6.png";
 
 var img7 = new imageExtend();
-img7.src = "./pic/2.png";
+img7.src = "./pic/7.png";
+
+var img8 = new imageExtend();
+img8.src = "./pic/8.png";
+
+var img9 = new imageExtend();
+img9.src = "./pic/9.png";
+
+var img10 = new imageExtend();
+img10.src = "./pic/10.png";
 
 class row extends Set{
 	x = 0;
@@ -37,6 +46,10 @@ class row extends Set{
 	height = 0;
 	width = 0;
 	ratio = 1;
+	paddingTop = 0; 
+	paddingRight = 0; 
+	paddingBottom = 0; 
+	paddingLeft = 0; 
 
 	set (x,y,width,height){
 		this.x = x;
@@ -50,6 +63,12 @@ class row extends Set{
 		}
 	}
 
+	set_padding(padding) {
+		this.paddingTop = padding.paddingTop; 
+		this.paddingRight = padding.paddingLeft;
+		this.paddingBottom = padding.paddingBottom;
+		this.paddingLeft = padding.paddingLeft; 		
+	}
 
 	calculate() {
 		for (let e of this.values()) {
@@ -78,9 +97,18 @@ class row extends Set{
 		let draw_index = 0;
 		for (let e of this.values()) {
 			if (e instanceof imageExtend){
-				ctx.drawImage(e,this.x+draw_index,this.y,e.width,this.height);
+				ctx.fillStyle = "black";
+				ctx.fillRect(this.x+draw_index,this.y,e.width,this.height);
+				ctx.drawImage(e,this.x+draw_index+this.paddingLeft,this.y+this.paddingRight,
+					e.width-this.paddingTop,this.height-this.paddingBottom);
 			} else {
 				e.set(this.x+draw_index,this.y,e.width,this.height);
+				e.set_padding({ 
+					paddingTop: this.paddingTop, 
+					paddingRight: this.paddingRight, 
+					paddingBottom: this.paddingBottom, 
+					paddingLeft: this.paddingLeft 
+				  });
 				e.draw();
 			}
 			draw_index += e.width;
@@ -96,6 +124,11 @@ class column extends Set{
 	height = 0;
 	width = 0;
 	ratio = 1;
+	paddingTop = 0; 
+	paddingRight = 0; 
+	paddingBottom = 0; 
+	paddingLeft = 0; 
+
 
 	set (x,y,width,height){
 		this.x = x;
@@ -108,6 +141,13 @@ class column extends Set{
 			e.width = width;
 		}
 
+	}
+
+	set_padding(padding) {
+		this.paddingTop = padding.paddingTop; 
+		this.paddingRight = padding.paddingRight;
+		this.paddingBottom = padding.paddingBottom;
+		this.paddingLeft = padding.paddingLeft; 		
 	}
 	
 	calculate() {
@@ -134,9 +174,18 @@ class column extends Set{
 		let draw_index = 0;
 		for (let e of this.values()) {
 			if (e instanceof imageExtend){
-				ctx.drawImage(e,this.x,this.y+draw_index,this.width,e.height);
+				ctx.fillStyle = "black";
+				ctx.fillRect(this.x,this.y+draw_index,this.width,e.height);
+				ctx.drawImage(e,this.x+this.paddingLeft,this.y+draw_index+this.paddingRight,
+					this.width-this.paddingTop,e.height-this.paddingBottom);
 			} else {
 				e.set(this.x,this.y+draw_index,this.width,e.height);
+				e.set_padding({ 
+					paddingTop: this.paddingTop, 
+					paddingRight: this.paddingRight, 
+					paddingBottom: this.paddingBottom, 
+					paddingLeft: this.paddingLeft 
+				  });
 				e.draw();
 			}
 			draw_index += e.height;
@@ -144,9 +193,10 @@ class column extends Set{
 	}
 }
 
-function drawStoryboard(root,size) {
+function drawStoryboard(root,params) {
 	root.calculate();
-	root.set(30,30,size,size * 0.5);
+	root.set(30,30,params.width,params.width * 0.5);
+	root.set_padding(params);
 	root.draw();
 }
 
@@ -156,13 +206,22 @@ function initiate() {
 	let c1 = new column();
 	let c2 = new column();
 	let c3 = new column();
-	
+	let c4 = new column();
+
+	c4.add(img8).add(img1);
 	c3.add(img2).add(img3);
-	r2.add(img4).add(c3);
-	c1.add(img5).add(r2);
-	r1.add(img7).add(c1).add(img1);
-	
-	drawStoryboard(r1,700);
+	r2.add(img4).add(img2).add(c4);
+	c1.add(img5).add(img10).add(r2).add(img6);
+	r1.add(c1).add(img7);
+ 
+	drawStoryboard(r1, { 
+		width: 1270, 
+		paddingTop: 7, 
+		paddingRight: 5, 
+		paddingBottom: 12, 
+		paddingLeft: 5 
+	}); 
+
 	d.body.appendChild(canvas);
 }
 

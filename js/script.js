@@ -64,10 +64,10 @@ class row extends Set{
 	}
 
 	set_padding(padding) {
-		this.paddingTop = padding.paddingTop; 
-		this.paddingRight = padding.paddingLeft;
-		this.paddingBottom = padding.paddingBottom;
 		this.paddingLeft = padding.paddingLeft; 		
+		this.paddingTop = padding.paddingTop; 
+		this.paddingRight = padding.paddingRight;
+		this.paddingBottom = padding.paddingBottom;
 	}
 
 	calculate() {
@@ -99,15 +99,16 @@ class row extends Set{
 			if (e instanceof imageExtend){
 				ctx.fillStyle = "black";
 				ctx.fillRect(this.x+draw_index,this.y,e.width,this.height);
-				ctx.drawImage(e,this.x+draw_index+this.paddingLeft,this.y+this.paddingRight,
-					e.width-this.paddingTop,this.height-this.paddingBottom);
+				ctx.drawImage(e,this.x+draw_index+this.paddingLeft,this.y+this.paddingTop,
+					e.width-this.paddingRight,this.height-this.paddingBottom);
 			} else {
 				e.set(this.x+draw_index,this.y,e.width,this.height);
 				e.set_padding({ 
 					paddingTop: this.paddingTop, 
+					paddingLeft: this.paddingLeft, 
 					paddingRight: this.paddingRight, 
-					paddingBottom: this.paddingBottom, 
-					paddingLeft: this.paddingLeft 
+					paddingBottom: this.paddingBottom 
+					
 				  });
 				e.draw();
 			}
@@ -144,10 +145,10 @@ class column extends Set{
 	}
 
 	set_padding(padding) {
+		this.paddingLeft = padding.paddingLeft; 		
 		this.paddingTop = padding.paddingTop; 
 		this.paddingRight = padding.paddingRight;
 		this.paddingBottom = padding.paddingBottom;
-		this.paddingLeft = padding.paddingLeft; 		
 	}
 	
 	calculate() {
@@ -176,15 +177,15 @@ class column extends Set{
 			if (e instanceof imageExtend){
 				ctx.fillStyle = "black";
 				ctx.fillRect(this.x,this.y+draw_index,this.width,e.height);
-				ctx.drawImage(e,this.x+this.paddingLeft,this.y+draw_index+this.paddingRight,
-					this.width-this.paddingTop,e.height-this.paddingBottom);
+				ctx.drawImage(e,this.x+this.paddingLeft,this.y+draw_index+this.paddingTop,
+					this.width-this.paddingRight,e.height-this.paddingBottom);
 			} else {
 				e.set(this.x,this.y+draw_index,this.width,e.height);
 				e.set_padding({ 
+					paddingLeft: this.paddingLeft, 
 					paddingTop: this.paddingTop, 
 					paddingRight: this.paddingRight, 
-					paddingBottom: this.paddingBottom, 
-					paddingLeft: this.paddingLeft 
+					paddingBottom: this.paddingBottom 
 				  });
 				e.draw();
 			}
@@ -215,11 +216,11 @@ function initiate() {
 	r1.add(c1).add(img7);
  
 	drawStoryboard(r1, { 
-		width: 1270, 
-		paddingTop: 7, 
-		paddingRight: 5, 
-		paddingBottom: 12, 
-		paddingLeft: 5 
+		width: 1220, 
+		paddingLeft: 4,
+		paddingTop: 4, 
+		paddingRight: 10, 
+		paddingBottom: 10 
 	}); 
 
 	d.body.appendChild(canvas);
